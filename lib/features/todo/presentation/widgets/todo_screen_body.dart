@@ -1,13 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_app/core/utils/app_colors.dart';
 import 'package:todo_app/core/utils/app_text_style.dart';
+import 'package:todo_app/features/data/models/task_model.dart';
 import 'custom_item.dart';
 
-class TodoScreenBody extends StatelessWidget {
+class TodoScreenBody extends StatefulWidget {
   const TodoScreenBody({super.key});
 
   @override
+  State<TodoScreenBody> createState() =>
+      _TodoScreenBodyState();
+}
+
+class _TodoScreenBodyState extends State<TodoScreenBody> {
+  late final TextEditingController _textEditingController;
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _textEditingController = TextEditingController();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    List tasks = context.watch<TaskModel>().allTask;
     return Padding(
       padding: const EdgeInsets.only(
         right: 16,
@@ -17,6 +35,7 @@ class TodoScreenBody extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
+          // heder card
           Container(
             margin: EdgeInsets.only(bottom: 18),
             alignment: Alignment.center,
@@ -53,7 +72,7 @@ class TodoScreenBody extends StatelessWidget {
                       ),
 
                       child: Text(
-                        '5/8',
+                        '5/${tasks.length}',
                         style: AppTextStyle.style600
                             .copyWith(
                               color: AppColors.veryDark,
@@ -77,66 +96,105 @@ class TodoScreenBody extends StatelessWidget {
             ),
           ),
 
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: TextFormField(
-                  style: AppTextStyle.style600.copyWith(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w300,
-                  ),
-
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: AppColors.veryDark,
-                    hintText: 'inpute a new task',
-                    hintStyle: AppTextStyle.style600
-                        .copyWith(
-                          fontWeight: FontWeight.w400,
-                          fontSize: 16,
-                          color: AppColors.gray,
+          Padding(
+            padding: EdgeInsets.only(bottom: 45),
+            child: Form(
+              key: _formKey,
+              child: Row(
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      validator: (value) {
+                        if (null == value || "" == value) {
+                          return 'Plase enter task';
+                        }
+                        return null;
+                      },
+                      controller: _textEditingController,
+                      style: AppTextStyle.style600.copyWith(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w300,
+                        decorationStyle:
+                            TextDecorationStyle.solid,
+                      ),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: AppColors.veryDark,
+                        hintText: 'inpute a new task',
+                        hintStyle: AppTextStyle.style600
+                            .copyWith(
+                              fontWeight: FontWeight.w400,
+                              fontSize: 16,
+                              color: AppColors.gray,
+                            ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius:
+                              BorderRadius.circular(6),
+                          borderSide: BorderSide(
+                            color: AppColors.gray,
+                          ),
                         ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                        6,
-                      ),
-                      borderSide: BorderSide(
-                        color: AppColors.gray,
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                        6,
-                      ),
-                      borderSide: BorderSide(
-                        width: 0.5,
-                        color: AppColors.gray,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius:
+                              BorderRadius.circular(6),
+                          borderSide: BorderSide(
+                            width: 0.5,
+                            color: AppColors.gray,
+                          ),
+                        ),
 
-              IconButton(
-                onPressed: () {},
-                icon: Container(
-                  margin: EdgeInsets.only(left: 12),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
+                        errorBorder: OutlineInputBorder(
+                          borderRadius:
+                              BorderRadius.circular(6),
+                          borderSide: BorderSide(
+                            width: 0.5,
+                            color: AppColors.errorColor,
+                          ),
+                        ),
+                        errorStyle: TextStyle(fontSize: 15),
+                        focusedErrorBorder:
+                            OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.circular(6),
+                              borderSide: BorderSide(
+                                width: 0.5,
+                                color: AppColors.errorColor,
+                              ),
+                            ),
+                      ),
+                    ),
                   ),
-                  child: Icon(Icons.add, size: 35),
-                ),
+
+                  IconButton(
+                    onPressed: () {
+                      if (_formKey.currentState!
+                          .validate()) {
+                        context.read<TaskModel>().addTask(
+                          _textEditingController.text,
+                        );
+                      }
+                    },
+                    icon: Container(
+                      margin: EdgeInsets.only(left: 12),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                      ),
+                      child: Icon(Icons.add, size: 35),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
 
           Expanded(
             child: ListView.builder(
-              itemCount: 5,
+              itemCount: tasks.length,
               itemBuilder: (context, index) {
-                return CustomItem();
+                return CustomItem(text: tasks[index].text);
               },
             ),
           ),

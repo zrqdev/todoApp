@@ -1,3 +1,6 @@
+import 'package:provider/provider.dart';
+import 'package:todo_app/features/data/models/task_model.dart';
+
 import 'features/todo/presentation/screens/todo_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -10,9 +13,12 @@ class TodoApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: TodoScreen(),
+    return ChangeNotifierProvider(
+      create: (context) => TaskModel(text: ''),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: TodoScreen(),
+      ),
     );
   }
 }
