@@ -2,12 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_app/core/utils/app_colors.dart';
 import 'package:todo_app/core/utils/app_text_style.dart';
-import 'package:todo_app/features/data/models/task_model.dart';
+import 'package:todo_app/features/todo/logic/todo_provider.dart';
 
+// ignore: must_be_immutable
 class CustomItem extends StatelessWidget {
-  const CustomItem({super.key, required this.text});
+  CustomItem({
+    super.key,
+    required this.text,
+    required this.isCheck,
+    required this.index,
+  });
 
   final String text;
+  bool isCheck;
+  final int index;
 
   @override
   Widget build(BuildContext context) {
@@ -20,9 +28,9 @@ class CustomItem extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Selector<TaskModel, bool>(
-            selector: (context, prov) => prov.isCheck,
-            builder: (context, isCheck, _) {
+          Selector<TodoProvider, bool>(
+            selector: (context, prov) => prov.isDone(index),
+            builder: (context, _, _) {
               return Container(
                 margin: EdgeInsets.only(
                   right: 10,
@@ -43,11 +51,10 @@ class CustomItem extends StatelessWidget {
                   checkColor: AppColors.checkColor,
 
                   value: isCheck,
-                  onChanged: (bool? value) {
-                    print('change Value');
+                  onChanged: (value) {
                     context
-                        .read<TaskModel>()
-                        .changeIsCheck();
+                        .read<TodoProvider>()
+                        .changeIsDone(index);
                   },
                 ),
               );

@@ -1,7 +1,6 @@
-import 'package:provider/provider.dart';
-import 'package:todo_app/features/data/models/task_model.dart';
-
+import 'package:todo_app/features/todo/logic/todo_provider.dart';
 import 'features/todo/presentation/screens/todo_screen.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -14,7 +13,7 @@ class TodoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => TaskModel(text: ''),
+      create: (context) => TodoProvider(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         home: TodoScreen(),

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_app/core/utils/app_colors.dart';
 import 'package:todo_app/core/utils/app_text_style.dart';
-import 'package:todo_app/features/data/models/task_model.dart';
+import 'package:todo_app/features/todo/data/models/task_model.dart';
+import 'package:todo_app/features/todo/logic/todo_provider.dart';
 import 'custom_item.dart';
 
 class TodoScreenBody extends StatefulWidget {
@@ -16,6 +18,7 @@ class TodoScreenBody extends StatefulWidget {
 class _TodoScreenBodyState extends State<TodoScreenBody> {
   late final TextEditingController _textEditingController;
   final _formKey = GlobalKey<FormState>();
+  int selectedItem = 0;
 
   @override
   void initState() {
@@ -25,7 +28,12 @@ class _TodoScreenBodyState extends State<TodoScreenBody> {
 
   @override
   Widget build(BuildContext context) {
-    List tasks = context.watch<TaskModel>().allTask;
+    List<TaskModel> _tasks = context
+        .watch<TodoProvider>()
+        .allTask;
+    int _countTasks = context
+        .watch<TodoProvider>()
+        .countFinshingTasks;
     return Padding(
       padding: const EdgeInsets.only(
         right: 16,
@@ -72,7 +80,7 @@ class _TodoScreenBodyState extends State<TodoScreenBody> {
                       ),
 
                       child: Text(
-                        '5/${tasks.length}',
+                        '$_countTasks/${_tasks.length}',
                         style: AppTextStyle.style600
                             .copyWith(
                               color: AppColors.veryDark,
@@ -86,7 +94,9 @@ class _TodoScreenBodyState extends State<TodoScreenBody> {
                   bottom: 0,
                   left: 20,
                   child: Text(
-                    '12.09.2025',
+                    DateFormat(
+                      'MM.dd.yyyy',
+                    ).format(DateTime.now()),
                     style: AppTextStyle.style600.copyWith(
                       fontSize: 20,
                     ),
@@ -171,9 +181,13 @@ class _TodoScreenBodyState extends State<TodoScreenBody> {
                     onPressed: () {
                       if (_formKey.currentState!
                           .validate()) {
-                        context.read<TaskModel>().addTask(
-                          _textEditingController.text,
-                        );
+                        print(_textEditingController.text);
+                        context
+                            .read<TodoProvider>()
+                            .addTask(
+                              _textEditingController.text,
+                            );
+                        _textEditingController.clear();
                       }
                     },
                     icon: Container(
@@ -192,9 +206,26 @@ class _TodoScreenBodyState extends State<TodoScreenBody> {
 
           Expanded(
             child: ListView.builder(
-              itemCount: tasks.length,
+              itemCount: _tasks.length,
               itemBuilder: (context, index) {
-                return CustomItem(text: tasks[index].text);
+                return Selector<TodoProvider, void>(
+                  selector: (context, prove) =>
+                      prove.isDone(index),
+                  builder: (context, _, _) {
+                    return GestureDetector(
+                      onTap: () {
+                        context
+                            .read<TodoProvider>()
+                            .changeIsDone(index);
+                      },
+                      child: CustomItem(
+                        text: _tasks[index].text,
+                        isCheck: _tasks[index].isDone,
+                        index: index,
+                      ),
+                    );
+                  },
+                );
               },
             ),
           ),
