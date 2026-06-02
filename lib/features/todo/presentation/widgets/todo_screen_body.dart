@@ -18,7 +18,6 @@ class TodoScreenBody extends StatefulWidget {
 class _TodoScreenBodyState extends State<TodoScreenBody> {
   late final TextEditingController _textEditingController;
   final _formKey = GlobalKey<FormState>();
-  int selectedItem = 0;
 
   @override
   void initState() {
@@ -27,13 +26,15 @@ class _TodoScreenBodyState extends State<TodoScreenBody> {
   }
 
   @override
+  void dispose() {
+    _textEditingController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    List<TaskModel> _tasks = context
-        .watch<TodoProvider>()
-        .allTask;
-    int _countTasks = context
-        .watch<TodoProvider>()
-        .countFinshingTasks;
+    TodoProvider todoProvider = context
+        .watch<TodoProvider>();
     return Padding(
       padding: const EdgeInsets.only(
         right: 16,
@@ -46,6 +47,7 @@ class _TodoScreenBodyState extends State<TodoScreenBody> {
           // heder card
           Container(
             margin: EdgeInsets.only(bottom: 18),
+
             alignment: Alignment.center,
             height: 187,
             decoration: BoxDecoration(
@@ -64,12 +66,13 @@ class _TodoScreenBodyState extends State<TodoScreenBody> {
                 Row(
                   mainAxisAlignment:
                       MainAxisAlignment.spaceAround,
+
                   children: [
                     Text(
                       "Todo Done",
                       style: AppTextStyle.style600,
                     ),
-
+                    Spacer(),
                     Container(
                       alignment: Alignment.center,
                       height: 116,
@@ -80,7 +83,7 @@ class _TodoScreenBodyState extends State<TodoScreenBody> {
                       ),
 
                       child: Text(
-                        '$_countTasks/${_tasks.length}',
+                        '${todoProvider.countFinshingTasks}/${todoProvider.allTask.length}',
                         style: AppTextStyle.style600
                             .copyWith(
                               color: AppColors.veryDark,
@@ -92,7 +95,7 @@ class _TodoScreenBodyState extends State<TodoScreenBody> {
 
                 Positioned(
                   bottom: 0,
-                  left: 20,
+                  left: 5,
                   child: Text(
                     DateFormat(
                       'MM.dd.yyyy',
@@ -113,6 +116,7 @@ class _TodoScreenBodyState extends State<TodoScreenBody> {
               child: Row(
                 crossAxisAlignment:
                     CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Expanded(
                     child: TextFormField(
@@ -177,11 +181,10 @@ class _TodoScreenBodyState extends State<TodoScreenBody> {
                     ),
                   ),
 
-                  IconButton(
-                    onPressed: () {
+                  GestureDetector(
+                    onTap: () {
                       if (_formKey.currentState!
                           .validate()) {
-                        print(_textEditingController.text);
                         context
                             .read<TodoProvider>()
                             .addTask(
@@ -190,7 +193,7 @@ class _TodoScreenBodyState extends State<TodoScreenBody> {
                         _textEditingController.clear();
                       }
                     },
-                    icon: Container(
+                    child: Container(
                       margin: EdgeInsets.only(left: 12),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
@@ -206,25 +209,20 @@ class _TodoScreenBodyState extends State<TodoScreenBody> {
 
           Expanded(
             child: ListView.builder(
-              itemCount: _tasks.length,
+              itemCount: todoProvider.allTask.length,
               itemBuilder: (context, index) {
-                return Selector<TodoProvider, void>(
-                  selector: (context, prove) =>
-                      prove.isDone(index),
-                  builder: (context, _, _) {
-                    return GestureDetector(
-                      onTap: () {
-                        context
-                            .read<TodoProvider>()
-                            .changeIsDone(index);
-                      },
-                      child: CustomItem(
-                        text: _tasks[index].text,
-                        isCheck: _tasks[index].isDone,
-                        index: index,
-                      ),
-                    );
+                final TaskModel task =
+                    todoProvider.allTask[index];
+
+                return GestureDetector(
+                  onTap: () {
+                    todoProvider.changeIsDone(index);
                   },
+                  child: CustomItem(
+                    text: task.text,
+                    isCheck: task.isDone,
+                    index: index,
+                  ),
                 );
               },
             ),

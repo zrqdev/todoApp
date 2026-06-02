@@ -22,6 +22,11 @@ class TodoProvider with ChangeNotifier {
     return _tasks[index].isDone;
   }
 
+  void deleteTask(int index) {
+    _tasks.removeAt(index);
+    notifyListeners();
+  }
+
   int get countFinshingTasks {
     return _tasks.where((task) => task.isDone).length;
   }

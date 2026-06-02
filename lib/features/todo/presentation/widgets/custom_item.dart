@@ -14,8 +14,8 @@ class CustomItem extends StatelessWidget {
   });
 
   final String text;
-  bool isCheck;
   final int index;
+  bool isCheck;
 
   @override
   Widget build(BuildContext context) {
@@ -27,50 +27,54 @@ class CustomItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Selector<TodoProvider, bool>(
-            selector: (context, prov) => prov.isDone(index),
-            builder: (context, _, _) {
-              return Container(
-                margin: EdgeInsets.only(
-                  right: 10,
-                  left: 10,
-                ),
-                height: 22,
-                width: 22,
-                decoration: BoxDecoration(
-                  borderRadius:
-                      BorderRadiusDirectional.circular(3),
-                  border: isCheck
-                      ? BoxBorder.all(color: AppColors.gray)
-                      : null,
-                ),
+          Container(
+            margin: EdgeInsets.only(right: 10, left: 10),
+            height: 22,
+            width: 22,
+            decoration: BoxDecoration(
+              borderRadius:
+                  BorderRadiusDirectional.circular(3),
+              border: isCheck
+                  ? BoxBorder.all(color: AppColors.gray)
+                  : null,
+            ),
 
-                child: Checkbox(
-                  fillColor: WidgetStateColor.transparent,
-                  checkColor: AppColors.checkColor,
-
-                  value: isCheck,
-                  onChanged: (value) {
-                    context
-                        .read<TodoProvider>()
-                        .changeIsDone(index);
-                  },
-                ),
-              );
-            },
+            child: Checkbox(
+              fillColor: WidgetStateColor.transparent,
+              checkColor: AppColors.checkColor,
+              value: isCheck,
+              onChanged: (value) {
+                context.read<TodoProvider>().changeIsDone(
+                  index,
+                );
+              },
+            ),
           ),
 
-          Text(
-            text,
-            style: AppTextStyle.style600.copyWith(
-              fontSize: 16,
+          Expanded(
+            child: Text(
+              text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AppTextStyle.style600.copyWith(
+                fontSize: 16,
+              ),
             ),
           ),
           Spacer(),
           IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.more_vert_rounded),
+            hoverColor: Colors.white,
+            onPressed: () {
+              context.read<TodoProvider>().deleteTask(
+                index,
+              );
+            },
+            icon: Icon(
+              Icons.remove_circle_outlined,
+              size: 30,
+            ),
           ),
         ],
       ),
