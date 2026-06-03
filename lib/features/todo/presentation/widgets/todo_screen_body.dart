@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_app/core/utils/app_colors.dart';
+import 'package:todo_app/core/utils/app_responsive.dart';
 import 'package:todo_app/core/utils/app_text_style.dart';
 import 'package:todo_app/features/todo/data/models/task_model.dart';
 import 'package:todo_app/features/todo/logic/todo_provider.dart';
@@ -17,6 +18,8 @@ class TodoScreenBody extends StatefulWidget {
 
 class _TodoScreenBodyState extends State<TodoScreenBody> {
   late final TextEditingController _textEditingController;
+  late AppResponsive _appResponsive;
+  late double topPadding;
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -35,11 +38,14 @@ class _TodoScreenBodyState extends State<TodoScreenBody> {
   Widget build(BuildContext context) {
     TodoProvider todoProvider = context
         .watch<TodoProvider>();
+    topPadding = MediaQuery.of(context).padding.top;
+    _appResponsive = AppResponsive(context: context);
+
     return Padding(
-      padding: const EdgeInsets.only(
+      padding: EdgeInsets.only(
         right: 16,
         left: 16,
-        top: 32,
+        top: (16 + topPadding),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.max,
@@ -47,9 +53,9 @@ class _TodoScreenBodyState extends State<TodoScreenBody> {
           // heder card
           Container(
             margin: EdgeInsets.only(bottom: 18),
-
+            padding: EdgeInsets.all(16),
             alignment: Alignment.center,
-            height: 187,
+            height: _appResponsive.headerCardHeight,
             decoration: BoxDecoration(
               border: Border.all(
                 color: const Color(
@@ -63,45 +69,56 @@ class _TodoScreenBodyState extends State<TodoScreenBody> {
 
             child: Stack(
               children: [
-                Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.spaceAround,
+                Padding(
+                  padding: EdgeInsets.only(bottom: 10),
+                  child: Row(
+                    mainAxisAlignment:
+                        MainAxisAlignment.spaceBetween,
 
-                  children: [
-                    Text(
-                      "Todo Done",
-                      style: AppTextStyle.style600,
-                    ),
-                    Spacer(),
-                    Container(
-                      alignment: Alignment.center,
-                      height: 116,
-                      width: 116,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-
-                      child: Text(
-                        '${todoProvider.countFinshingTasks}/${todoProvider.allTask.length}',
+                    children: [
+                      Text(
+                        "Todo Done",
                         style: AppTextStyle.style600
                             .copyWith(
-                              color: AppColors.veryDark,
+                              fontSize: _appResponsive
+                                  .setFontSize(40),
                             ),
                       ),
-                    ),
-                  ],
+
+                      Container(
+                        alignment: Alignment.center,
+
+                        height: _appResponsive.circleHeight,
+                        width: _appResponsive.circleWidth,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+
+                        child: Text(
+                          '${todoProvider.countFinshingTasks}/${todoProvider.allTask.length}',
+                          style: AppTextStyle.style600
+                              .copyWith(
+                                color: AppColors.veryDark,
+                                fontSize: _appResponsive
+                                    .setFontSize(40),
+                              ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
 
                 Positioned(
                   bottom: 0,
-                  left: 5,
                   child: Text(
                     DateFormat(
                       'MM.dd.yyyy',
                     ).format(DateTime.now()),
                     style: AppTextStyle.style600.copyWith(
-                      fontSize: 20,
+                      fontSize: _appResponsive.setFontSize(
+                        20,
+                      ),
                     ),
                   ),
                 ),

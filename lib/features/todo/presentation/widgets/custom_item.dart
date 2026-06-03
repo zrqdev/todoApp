@@ -27,7 +27,6 @@ class CustomItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Container(
             margin: EdgeInsets.only(right: 10, left: 10),
@@ -63,7 +62,7 @@ class CustomItem extends StatelessWidget {
               ),
             ),
           ),
-          Spacer(),
+
           IconButton(
             hoverColor: Colors.white,
             onPressed: () {

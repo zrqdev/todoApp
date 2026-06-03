@@ -1,9 +1,17 @@
+import 'package:flutter/services.dart';
 import 'package:todo_app/features/todo/logic/todo_provider.dart';
 import 'features/todo/presentation/screens/todo_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
   runApp(const TodoApp());
 }
 
